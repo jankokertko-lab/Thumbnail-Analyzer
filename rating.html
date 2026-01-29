@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Thumbnail Visual Rater</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin:0; padding:0; font-family:'Inter',sans-serif; }
+body { height:100vh; overflow:hidden; display:flex; justify-content:center; align-items:center; background:#0b0f1e; color:white; }
+
+/* Animated gradient background */
+#bg {
+  position:fixed; inset:0;
+  background: linear-gradient(-45deg,#0b0f1e,#151a33,#0d1229,#1c214a);
+  background-size: 400% 400%;
+  z-index:0;
+  animation: gradientMove 25s ease infinite;
+}
+@keyframes gradientMove {0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+
+/* Particles */
+.particle { position:absolute; border-radius:50%; background: rgba(255,255,255,0.6); animation: drift linear infinite; }
+@keyframes drift {from{transform:translate(0,0)} to{transform:translate(150px,-300px)}}
+
+/* Container */
+.container { position:relative; z-index:2; display:flex; gap:50px; background: rgba(255,255,255,0.06); padding:50px; border-radius:28px; max-width:1000px; box-shadow:0 40px 80px rgba(0,0,0,0.7); opacity:0; transition:opacity 1s ease; }
+.thumbnail-preview { width:440px; display:flex; align-items:center; justify-content:center; }
+.thumbnail-preview img { max-width:100%; max-height:480px; border-radius:22px; object-fit:contain; box-shadow:0 25px 50px rgba(0,0,0,0.7); }
+.results { width:420px; }
+h1 { font-size:40px; margin-bottom:10px; color:white; }
+.score { font-size:78px; font-weight:800; margin-bottom:15px; color:white; }
+.metric { margin:8px 0; font-size:17px; opacity:0.9; color:white; }
+.improve { margin-top:25px; background: rgba(255,255,255,0.12); padding:22px; border-radius:18px; }
+.improve h2 { margin-top:0; font-size:20px; color:white; }
+.opinion { margin-top:15px; font-size:18px; font-style:italic; opacity:0.9; color:white; }
+
+/* Loading overlay */
+#loadingOverlay {
+  position:fixed; inset:0; background: rgba(11,15,30,0.95); z-index:10; display:flex; flex-direction:column; justify-content:center; align-items:center; color:white; font-size:28px;
+}
+#loadingText { margin-bottom:20px; }
+#loadingPercent { font-size:48px; font-weight:800; }
+</style>
+</head>
+<body>
+
+<div id="bg"></div>
+
+<!-- Loading overlay -->
+<div id="loadingOverlay">
+  <div id="loadingText">Analyzing Thumbnail...</div>
+  <div id="loadingPercent">0%</div>
+</div>
+
+<div class="container">
+  <div class="thumbnail-preview"><img id="thumb"></div>
+  <div class="results">
+    <h1>Thumbnail Rating</h1>
+    <div class="score" id="finalScore">–</div>
+    <div id="metrics"></div>
+    <div class="improve">
+      <h2>Tips for Improvement</h2>
+      <ul id="tips"></ul>
+    </div>
+    <div class="opinion" id="opinion"></div>
+  </div>
+</div>
+
+<canvas id="canvas" hidden></canvas>
+
+<script>
+// Elements
+const img = document.getElementById("thumb");
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+const container = document.querySelector(".container");
+const overlay = document.getElementById("loadingOverlay");
+const percentText = document.getElementById("loadingPercent");
+
+// Load the thumbnail from localStorage
+img.src = localStorage.getItem("thumbnailToRate");
+
+// Particle background
+function randomParticles(count){
+  for(let i=0;i<count;i++){
+    const p=document.createElement('div');
+    p.className='particle';
+    const size = 2 + Math.random()*3;
+    p.style.width=size+'px';
+    p.style.height=size+'px';
+    p.style.left=Math.random()*window.innerWidth+'px';
+    p.style.top=Math.random()*window.innerHeight+'px';
+    p.style.animationDuration=(10+Math.random()*20)+'s';
+    p.style.background='rgba(255,255,255,'+(0.3+Math.random()*0.5)+')';
+    document.body.appendChild(p);
+  }
+}
+randomParticles(80);
+
+function clamp(v){ return Math.max(0, Math.min(5,v)); }
+
+img.onload = ()=>{
+  // Loading animation
+  let percent = 0;
+  const loadingInterval = setInterval(()=>{
+    percent += Math.random()*5;
+    if(percent>100) percent=100;
+    percentText.textContent=Math.floor(percent)+'%';
+    if(percent>=100){
+      clearInterval(loadingInterval);
+      performRating();
+    }
+  },50);
+};
+
+function performRating(){
+  canvas.width = img.naturalWidth;
+  canvas.height = img.naturalHeight;
+  ctx.drawImage(img,0,0);
+  const data = ctx.getImageData(0,0,canvas.width,canvas.height).data;
+  const pixels = data.length/4;
+
+  // 1. Clarity / makes sense
+  let clarityScore = 0;
+  const ratio = img.naturalWidth / img.naturalHeight;
+  if(ratio>0.6 && ratio<1.8) clarityScore += 2; // max 2
+
+  // Edge coherence
+  let edges=0;
+  for(let i=0;i<pixels;i+=20){
+    const r=data[i*4], g=data[i*4+1], b=data[i*4+2];
+    const avg=(r+g+b)/3;
+    if(i>0){
+      const prev = (i-1)*4;
+      const prevAvg = (data[prev]+data[prev+1]+data[prev+2])/3;
+      if(Math.abs(avg-prevAvg)>15) edges++;
+    }
+  }
+  const edgeDensity = edges/(pixels/20);
+  clarityScore += Math.min(3, edgeDensity*3); // max 3
+
+  // 2. Provocative / eye-catching factor
+  let provocativeScore = 0;
+  let faceClusters=0;
+  let chaosScore=0;
+
+  for(let i=0;i<pixels;i+=50){
+    const r=data[i*4], g=data[i*4+1], b=data[i*4+2];
+    // simple skin-tone approximation
+    if(r>95 && g>40 && g<100 && b>20 && b<70) faceClusters++;
+    // chaos approx: very high contrast within small neighborhoods
+    if(i>0){
+      const prev = (i-1)*4;
+      const diff = Math.abs(r-data[prev])+Math.abs(g-data[prev+1])+Math.abs(b-data[prev+2]);
+      if(diff>150) chaosScore++;
+    }
+  }
+  const faceFactor = Math.min(3, faceClusters/50); // faces contribute up to 3
+  const chaosFactor = Math.max(0, 2 - Math.min(2, chaosScore/50)); // too chaotic reduces score
+
+  provocativeScore = clamp(faceFactor + chaosFactor); // max 5
+
+  // 3. Viewer interest (center focus)
+  let centerSum=0, centerCount=0;
+  const cx=canvas.width/2, cy=canvas.height/2, radius=Math.min(canvas.width,canvas.height)/3;
+  for(let y=Math.floor(cy-radius);y<Math.floor(cy+radius);y+=5){
+    for(let x=Math.floor(cx-radius);x<Math.floor(cx+radius);x+=5){
+      const idx=(y*canvas.width+x)*4;
+      centerSum+=(data[idx]+data[idx+1]+data[idx+2])/3;
+      centerCount++;
+    }
+  }
+  const centerBrightness=centerSum/centerCount;
+  const viewerInterest = clamp(centerBrightness/25); // max 5
+
+  const finalScore = clamp((clarityScore*0.4 + provocativeScore*0.4 + viewerInterest*0.2)).toFixed(1);
+
+  document.getElementById("finalScore").textContent = finalScore+"/5";
+  document.getElementById("metrics").innerHTML=`
+    <div class="metric">Clarity / Makes Sense: ${clarityScore.toFixed(1)}/5</div>
+    <div class="metric">Provocative / Eye-Catching: ${provocativeScore.toFixed(1)}/5</div>
+    <div class="metric">Viewer Interest: ${viewerInterest.toFixed(1)}/5</div>
+  `;
+
+  const tips = document.getElementById("tips");
+  tips.innerHTML='';
+  if(clarityScore<3) tips.innerHTML+='<li>Thumbnail is unclear or proportions are off. Fix composition or focus.</li>';
+  if(provocativeScore<3) tips.innerHTML+='<li>Use expressive faces or compelling atmosphere to attract clicks.</li>';
+  if(viewerInterest<3) tips.innerHTML+='<li>Center key elements or highlight focal point more.</li>';
+
+  document.getElementById("opinion").textContent = "Rated based on clarity, eye-catching factor (faces & vibe), and viewer interest.";
+
+  overlay.style.transition='opacity 0.8s ease';
+  overlay.style.opacity='0';
+  setTimeout(()=>overlay.style.display='none',800);
+  container.style.opacity='1';
+}
+</script>
+
+</body>
+</html>

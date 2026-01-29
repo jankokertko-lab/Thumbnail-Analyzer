@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Thumbnail Rating</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', sans-serif;
+}
+
+body {
+  height: 100vh;
+  overflow: hidden;
+  background: linear-gradient(-45deg, #1b1630, #2c2455, #1a1438, #3b2f63);
+  background-size: 400% 400%;
+  animation: gradientMove 25s ease infinite;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 20px;
+}
+
+/* Left and right panels */
+.left, .right {
+  position: relative; /* keep everything inside panels relative */
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* vertical centering inside panel */
+}
+
+/* Optional spacing between left and right panels */
+.left {
+  margin-right: 40px; /* adjust manually if needed */
+}
+
+.right {
+  margin-left: 40px;  /* adjust manually if needed */
+}
+
+/* Remove fixed/absolute positioning from SUPPORT */
+.support {
+  position: relative; /* now can be moved manually in HTML */
+  bottom: auto;
+  left: auto;
+}
+
+/* Title and Made-by text */
+.title, .made-by {
+  position: relative; /* manually movable in HTML */
+  top: auto;
+  left: auto;
+}
+
+/* 🌊 ANIMATED GRADIENT */
+body {
+  height: 100vh;
+  overflow: hidden;
+  background: linear-gradient(-45deg, #1b1630, #2c2455, #1a1438, #3b2f63);
+  background-size: 400% 400%;
+  animation: gradientMove 25s ease infinite;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 20px;
+}
+
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* 🌫 BACKGROUND LAYERS */
+.background {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 0;
+}
+
+/* ✨ PARTICLES */
+.particle {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: rgba(255,255,255,0.4);
+  border-radius: 50%;
+  filter: blur(2px);
+  animation: driftRight linear infinite;
+}
+
+@keyframes driftRight {
+  0% { transform: translate(0,0); opacity:0; }
+  20% { opacity: 0.5; }
+  50% { transform: translate(80px,-60px); opacity:0.6; }
+  100% { transform: translate(160px,-120px); opacity:0; }
+}
+
+/* ✨ GLOWING PARTICLES */
+.glow-particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: rgba(255,255,255,0.6);
+  border-radius: 50%;
+  filter: blur(2px);
+  animation: floatParticles linear infinite;
+}
+
+@keyframes floatParticles {
+  0% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.6;
+  }
+  50% {
+    transform: translate(calc(50px * var(--dir-x)), calc(-60px * var(--dir-y)));
+    opacity: 0.5;
+  }
+  100% {
+    transform: translate(calc(100px * var(--dir-x)), calc(-120px * var(--dir-y)));
+    opacity: 0;
+  }
+}
+
+.left, .right {
+  position: relative;
+  z-index: 2;
+}
+
+.left {
+  width: 35%;
+  padding: 20px;        /* spacing from edges */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* pushes top/middle/bottom elements */
+  height: 100vh;        /* full viewport height */
+  box-sizing: border-box;
+}
+
+.title {
+  background: rgba(255,255,255,0.12);
+  padding: 20px 30px;
+  border-radius: 20px;
+  font-size: 32px;
+  font-weight: 800;
+  width: fit-content;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+}
+
+.made-by {
+  margin-top: 10px;
+  opacity: 0.8;
+  font-size: 14px;
+}
+
+.where {
+  margin-top: 0px;
+  text-align: center;
+  opacity: 0.7;
+  letter-spacing: 2px;
+}
+
+.nav-btn {
+  margin: 22px auto;
+  width: 460px;
+  padding: 33px;
+  border-radius: 26px;
+  background: rgba(255,255,255,0.18);
+  text-align: center;
+  font-weight: 700;
+  font-size: 46px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  text-decoration: none;
+  color: white;
+  display: block;
+}
+
+.nav-btn:hover {
+  transform: scale(1.1);
+  background: rgba(255,255,255,0.38);
+  box-shadow:
+    0 0 25px rgba(255,255,255,0.6),
+    0 0 60px rgba(154,140,255,0.9);
+}
+
+.support {
+  opacity: 0.7;
+  font-size: 14px;
+}
+
+.right {
+  width: 65%;
+  padding: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.rate-title {
+  font-size: 28px;
+  font-weight: 800;
+  margin-bottom: 30px;
+}
+
+.thumbnail-card {
+  background: rgba(255,255,255,0.12);
+  border-radius: 25px;
+  padding: 15px;
+  width: 540px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+}
+
+.thumbnail {
+  position: relative;
+  cursor: pointer;
+  border-radius: 22px;
+  overflow: hidden;
+}
+
+.thumbnail img {
+  width: 100%;
+  display: block;
+}
+
+.rating {
+  margin-top: 10px;
+  padding: 14px 24px;
+  border-radius: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.stars {
+  color: gold;
+  font-size: 26px;
+  letter-spacing: 3px;
+}
+
+.upload-bar {
+  margin-top: 20px;
+  background: rgba(255,255,255,0.95);
+  padding: 14px 24px;
+  border-radius: 22px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 22px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.upload-bar.ready {
+  background: rgba(255,255,255,0.18);
+  color: rgb(255, 255, 255);
+  justify-content: center;
+}
+
+.upload-bar.ready:hover {
+  transform: scale(1.02);
+  background: rgba(255,255,255,0.38);
+  box-shadow: 0 0 35px rgba(154,140,255,0.9);
+}
+
+.upload-bar.ready .plus {
+  display: none;
+}
+
+.upload-bar.ready .upload-placeholder {
+  color: white;
+}
+
+
+.plus {
+  background: #ccc;
+  color: black;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.plus:hover {
+  background: #fff;
+  transform: scale(1.12);
+}
+
+.upload-placeholder {
+  color: #777;
+}
+
+.start-btn {
+  display: none;
+  margin-top: 25px;
+  padding: 22px 50px;
+  font-size: 26px;
+  font-weight: 800;
+  border-radius: 26px;
+  background: rgba(255,255,255,0.18);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.start-btn:hover {
+  transform: scale(1.1);
+  background: rgba(255,255,255,0.38);
+  box-shadow: 0 0 35px rgba(154,140,255,0.9);
+}
+
+.upload-wrapper {
+  display: flex;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.start-bar {
+  background: rgba(255,255,255,0.18);
+  padding: 14px 30px; /* EXACT same as upload-bar */
+  border-radius: 24px;
+  font-size: 24px;
+  font-weight: 800;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: not-allowed;
+  opacity: 0.5;
+  transition: all 0.25s ease;
+
+  min-width: 120px; /* keeps it visually balanced */
+}
+
+.start-bar.active {
+  cursor: pointer;
+  opacity: 1;
+}
+
+.start-bar.active:hover {
+  transform: scale(1.08);
+  background: rgba(255,255,255,0.38);
+  box-shadow: 0 0 35px rgba(154,140,255,0.9);
+}
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 🌟 TOP-RIGHT SLIDE MENU */
+.menu-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+}
+
+/* Menu button */
+.menu-toggle {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.22);
+  backdrop-filter: blur(14px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+  transition: all 0.3s ease;
+}
+
+.menu-toggle:hover {
+  background: rgba(255,255,255,0.4);
+  transform: scale(1.08);
+}
+
+.menu-toggle span {
+  font-size: 26px;
+  font-weight: 800;
+}
+
+/* Sliding menu */
+.menu-panel {
+  position: absolute;
+  right: 70px;
+  display: flex;
+  gap: 16px;
+  padding: 16px 22px;
+  border-radius: 22px;
+  background: rgba(255,255,255,0.18);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 18px 45px rgba(0,0,0,0.6);
+
+  transform: translateX(16px);
+  opacity: 0;
+  pointer-events: none;
+
+  transition:
+    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.3s ease;
+}
+
+.menu-container.active .menu-panel {
+  transform: translateX(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Menu links */
+.menu-panel a {
+  text-decoration: none;
+  color: white;
+  font-weight: 700;
+  letter-spacing: 1px;
+  padding: 10px 18px;
+  border-radius: 16px;
+
+  transform: translateY(0);
+  transition:
+    transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+    background 0.22s ease,
+    box-shadow 0.22s ease;
+}
+
+.menu-panel a:hover {
+  transform: translateY(-4px);
+  background: rgba(255,255,255,0.35);
+  box-shadow:
+    0 0 16px rgba(154,140,255,0.7),
+    0 8px 24px rgba(0,0,0,0.45);
+}
+
+.menu-panel a:hover {
+  transform: translateY(-3px) scale(1.06);
+  background: rgba(255,255,255,0.35);
+  box-shadow:
+    0 0 18px rgba(154,140,255,0.7),
+    0 6px 20px rgba(0,0,0,0.4);
+}
+
+/* Container transition for LEFT + RIGHT panels */
+.left, .right {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.5s cubic-bezier(0.22,1,0.36,1), transform 0.5s cubic-bezier(0.22,1,0.36,1);
+}
+
+/* ===== SCREEN SYSTEM ===== */
+.left, .right {
+  transition:
+    transform 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.6s ease;
+}
+
+/* Home hidden */
+body.show-about .left,
+body.show-about .right {
+  transform: translateX(-80px);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ===== ABOUT SCREEN ===== */
+.about-screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transform: translateX(80px);
+  pointer-events: none;
+  transition:
+    transform 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.6s ease;
+  z-index: 3;
+}
+
+body.show-about .about-screen {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+/* ABOUT CONTENT CARD */
+.about-content {
+  max-width: 700px;
+  background: rgba(255,255,255,0.14);
+  padding: 50px 60px;
+  border-radius: 30px;
+  backdrop-filter: blur(18px);
+  box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+  text-align: center;
+}
+
+.about-content h1 {
+  font-size: 48px;
+  font-weight: 800;
+  margin-bottom: 20px;
+}
+
+.about-content p {
+  font-size: 20px;
+  line-height: 1.6;
+  opacity: 0.9;
+  margin-bottom: 16px;
+}
+
+/* ===== GLOBAL PAGE TRANSITION ===== */
+body {
+  transition: background-position 1s ease;
+}
+
+/* ===== GLOBAL TRANSITION BASE ===== */
+.left,
+.right,
+.background {
+  transition:
+    opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+/* ===== ABOUT MODE (FULL DISAPPEAR) ===== */
+body.about-mode .left {
+  opacity: 0;
+  transform: translateX(-150px);
+  pointer-events: none;
+}
+
+body.about-mode .right {
+  opacity: 0;
+  transform: translateX(150px);
+  pointer-events: none;
+}
+
+body.about-mode .background {
+  opacity: 0;
+  transform: scale(1.15);
+  pointer-events: none;
+}
+
+/* Particles ACTUALLY vanish */
+.particle,
+.glow-particle {
+  transition: opacity 0.5s ease;
+}
+
+body.about-mode .particle,
+body.about-mode .glow-particle {
+  opacity: 0;
+}
+
+/* ===== ABOUT POPUP OVERLAY ===== */
+.about-popup {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background: rgba(10, 10, 30, 0.55);
+  backdrop-filter: blur(6px);
+
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+
+  z-index: 900; /* BELOW menu (menu is 999) */
+}
+
+/* Card */
+.about-card {
+  background: #241f3f;
+  border-radius: 28px;
+  padding: 50px;
+  width: 80%;
+  max-width: 800px;
+
+  display: flex;
+  gap: 50px;
+  align-items: top;
+
+  box-shadow: 0 40px 90px rgba(0,0,0,0.7);
+
+  transform: scale(0.7) translateY(60px);
+  opacity: 0;
+
+  transition:
+    transform 0.9s cubic-bezier(0.22,1,0.36,1),
+    opacity 0.6s ease;
+}
+
+/* Text */
+.about-text h1 {
+  color: #f1a6ff;
+  letter-spacing: 4px;
+  font-size: 36px;
+  margin-bottom: 50px;
+}
+
+.about-text p {
+  font-size: 18px;
+  line-height: 1.6;
+  opacity: 0.9;
+}
+
+/* Image */
+.about-image img {
+  width: 415px;        /* ⬅ smaller */
+  height: auto;
+
+}
+
+/* ===== ACTIVE STATE ===== */
+body.about-mode .about-popup {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+body.about-mode .about-card {
+  transform: scale(1) translateY(0);
+  opacity: 1;
+}
+
+/* ===== HIDE HOME CONTENT ===== */
+body.about-mode .left,
+body.about-mode .right {
+  opacity: 0;
+  transform: scale(0.96);
+  pointer-events: none;
+  transition: all 0.5s ease;
+}
+
+.link-text {
+  font-size: 18px;
+  line-height: 1.6;
+  opacity: 0.9;
+}
+
+ /* 🌌 SOFT DEPTH GLOW */
+  .background::before {
+    content: "";
+    position: absolute;
+    inset: -20%;
+    background:
+      radial-gradient(circle at 20% 30%, rgba(255,255,255,0.06), transparent 40%),
+      radial-gradient(circle at 80% 70%, rgba(255,255,255,0.05), transparent 45%),
+      radial-gradient(circle at 50% 50%, rgba(255,255,255,0.04), transparent 50%);
+    animation: glowDrift 35s ease-in-out infinite;
+    z-index: 0;
+  }
+
+  @keyframes glowDrift {
+    0%   { transform: translate(0,0) scale(1); }
+    50%  { transform: translate(-4%, -3%) scale(1.05); }
+    100% { transform: translate(0,0) scale(1); }
+  }
+
+  /* 🌬️ PARTICLE MICRO FLOAT */
+  .particle,
+  .glow-particle {
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  @keyframes driftRight {
+    0%   { transform: translate(0,0); opacity:0; }
+    25%  { opacity:0.5; }
+    50%  { transform: translate(80px,-60px) translateY(-10px); opacity:0.6; }
+    75%  { transform: translate(120px,-90px) translateY(6px); }
+    100% { transform: translate(160px,-120px); opacity:0; }
+  }
+
+  /* 🫧 BACKGROUND BREATH */
+  .background {
+    animation: backgroundFloat 18s ease-in-out infinite;
+  }
+
+  @keyframes backgroundFloat {
+    0%   { transform: translateY(0); }
+    50%  { transform: translateY(-12px); }
+    100% { transform: translateY(0); }
+  }
+
+  /* 🚀 SMOOTH PERFORMANCE */
+  body,
+  .background,
+  .particle,
+  .glow-particle {
+    will-change: transform, opacity;
+    transform: translateZ(0);
+  }
+
+  /* 🎴 INTERACTIVE ABOUT CARD */
+.about-card {
+  transform-style: preserve-3d;
+  transition:
+    transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.25s ease;
+  will-change: transform;
+}
+
+.about-card:hover {
+  box-shadow: 0 50px 120px rgba(0,0,0,0.8);
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- 🌟 TOP RIGHT MENU -->
+<div class="menu-container" id="menu">
+  <div class="menu-panel">
+    <a href="#" id="homeBtn">HOME</a>
+    <a href="#" id="aboutBtn">ABOUT</a>
+    <a href="#">CONTACT</a>
+  </div>
+
+  <div class="menu-toggle" id="menuToggle">
+    <span>☰</span>
+  </div>
+</div>
+
+<div class="background">
+<!-- PARTICLES -->
+    <div class="particle" style="left:10%; top:80%; animation-duration:12s;"></div>
+    <div class="particle" style="left:30%; top:60%; animation-duration:15s;"></div>
+    <div class="particle" style="left:50%; top:90%; animation-duration:18s;"></div>
+    <div class="particle" style="left:70%; top:70%; animation-duration:14s;"></div>
+    <div class="particle" style="left:90%; top:85%; animation-duration:20s;"></div>
+    <div class="particle" style="left:20%; top:50%; animation-duration:16s;"></div>
+    <div class="particle" style="left:40%; top:75%; animation-duration:19s;"></div>
+    <div class="particle" style="left:80%; top:65%; animation-duration:21s;"></div>
+    <div class="glow-particle" style="left:5%; top:80%; --dir-x:1; --dir-y:1; animation-duration:12s;"></div>
+    <div class="glow-particle" style="left:20%; top:60%; --dir-x:-1; --dir-y:1; animation-duration:15s;"></div>
+    <div class="glow-particle" style="left:35%; top:90%; --dir-x:1; --dir-y:0.5; animation-duration:18s;"></div>
+    <div class="glow-particle" style="left:50%; top:70%; --dir-x:-0.5; --dir-y:1; animation-duration:14s;"></div>
+    <div class="glow-particle" style="left:65%; top:85%; --dir-x:0.7; --dir-y:1; animation-duration:20s;"></div>
+    <div class="glow-particle" style="left:80%; top:50%; --dir-x:-1; --dir-y:0.7; animation-duration:16s;"></div>
+    <div class="glow-particle" style="left:90%; top:75%; --dir-x:1; --dir-y:0.6; animation-duration:22s;"></div>
+    <!-- EXTRA PARTICLES FOR ABOUT -->
+  <div class="extra-particles" id="extraParticles">
+    <div class="particle" style="left:15%; top:85%; animation-duration:10s;"></div>
+    <div class="particle" style="left:30%; top:75%; animation-duration:14s;"></div>
+    <div class="particle" style="left:50%; top:90%; animation-duration:12s;"></div>
+    <div class="particle" style="left:70%; top:80%; animation-duration:16s;"></div>
+    <div class="glow-particle" style="left:20%; top:90%; --dir-x:1; --dir-y:1; animation-duration:14s;"></div>
+    <div class="glow-particle" style="left:60%; top:85%; --dir-x:-1; --dir-y:1; animation-duration:18s;"></div>
+  </div>
+</div>
+
+<!-- LEFT -->
+<div class="left">
+  <!-- TOP -->
+  <div>
+    <div class="title">THUMBNAIL RATING</div>
+    <div class="made-by">Made by Karolko</div>
+  </div>
+
+  <!-- MIDDLE (social media buttons) -->
+  <div>
+    <div class="where">WHERE YOU CAN FIND ME</div>
+    <a class="nav-btn" href="https://www.youtube.com/@Karol_Pal%C3%A1%C5%A1thy" target="_blank">YOUTUBE</a>
+    <a class="nav-btn" href="https://tiktok.com/@karolesko_" target="_blank">TIKTOK</a>
+    <a class="nav-btn" href="https://www.instagram.com/palasthy_karol/" target="_blank">INSTAGRAM</a>
+  </div>
+
+  <!-- BOTTOM -->
+  <div class="support">SUPPORT ME</div>
+</div>
+
+
+<!-- RIGHT -->
+<div class="right">
+  <div class="rate-title">WE WILL RATE YOUR THUMBNAIL</div>
+
+  <div class="thumbnail-card">
+    <div class="thumbnail">
+      <img id="thumbnailImage" src="thumbnail1.jpg">
+    </div>
+
+     <div class="upload-wrapper">
+        <div class="upload-bar" id="uploadBar">
+            <div class="plus">+</div>
+            <div class="upload-placeholder">Upload your thumbnail</div>
+        </div>
+
+     <div class="start-bar" id="startBar">START</div>
+</div>
+
+<!-- ABOUT SCREEN -->
+<div class="about-screen" id="aboutScreen">
+  <div class="about-content">
+    <h1>ABOUT</h1>
+    <p>
+      This tool helps creators get quick, honest feedback on their thumbnails.
+      Built for YouTubers, TikTokers, and anyone who wants better CTR.
+    </p>
+    <p>
+      Designed & developed by <strong>Karolko</strong>.
+    </p>
+  </div>
+</div>
+
+<input type="file" id="fileInput" accept="image/*" hidden>
+
+     <div class="rating">
+         <div class="stars">★★★★★</div>
+         </div>
+     </div>
+
+  <input type="file" id="fileInput" accept="image/*" hidden>
+</div>
+
+<script>
+const fileInput = document.getElementById("fileInput");
+const thumbnailImage = document.getElementById("thumbnailImage");
+const startBar = document.getElementById("startBar");
+const uploadBar = document.getElementById("uploadBar");
+
+let hasImage = false;
+
+uploadBar.addEventListener("click", () => {
+  fileInput.click();
+});
+
+fileInput.addEventListener("change", function () {
+  const file = this.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    thumbnailImage.src = reader.result;
+    hasImage = true;
+    startBar.classList.add("active");
+  };
+  reader.readAsDataURL(file);
+});
+
+startBar.addEventListener("click", () => {
+  if (!hasImage) return;
+
+  localStorage.setItem("thumbnailToRate", thumbnailImage.src);
+  window.open("rating.html", "_blank");
+});
+
+const aboutBtn = document.getElementById("aboutBtn");
+const homeBtn = document.getElementById("homeBtn");
+const menuToggle = document.getElementById("menuToggle");
+const menu = document.getElementById("menu");
+
+menuToggle.addEventListener("click", () => {
+  menu.classList.toggle("active");
+});
+
+aboutBtn.addEventListener("click", (e) => {
+  e.preventDefault();
+  document.body.classList.add("about-mode");
+  menu.classList.remove("active");
+});
+
+homeBtn.addEventListener("click", (e) => {
+  e.preventDefault();
+  document.body.classList.remove("about-mode");
+  menu.classList.remove("active");
+});
+
+/* 🎴 ABOUT CARD TILT */
+const aboutCard = document.querySelector(".about-card");
+
+if (aboutCard) {
+  aboutCard.addEventListener("mousemove", (e) => {
+    const rect = aboutCard.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+
+    const rotateX = -(y - centerY) / 18;
+    const rotateY = (x - centerX) / 18;
+
+    aboutCard.style.transform =
+      `rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-6px)`;
+  });
+
+  aboutCard.addEventListener("mouseleave", () => {
+    aboutCard.style.transform =
+      "rotateX(0deg) rotateY(0deg) translateY(0)";
+  });
+}
+
+</script>
+
+<!-- ABOUT POPUP CARD -->
+<div class="about-popup" id="aboutPopup">
+  <div class="about-card">
+    <div class="about-text">
+      <h1>SOMETHING ABOUT ME</h1>
+
+      <p>
+        Hi my name is <strong>KAROL PALÁŠTHY</strong> and I am 18 y.o. video editor
+        and also a content creator. My passion for editing started when I was 11
+        and got my hands on a phone for the first time ever.
+        <br><br>
+        I edited over 300 videos since then and haven’t stopped yet.
+        This site was created for creators like me that would like to level up
+        a little bit.
+      </p>
+    </div>
+
+    <div class="about-image">
+      <img src="about.png" alt="About me">
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
